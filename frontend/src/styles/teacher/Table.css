@@ -1,0 +1,87 @@
+.table-container {
+    width: 100%;
+    max-height: 60vh;
+    overflow-y: auto;
+    border-radius: 1.5vmin;
+    background: rgba(255, 255, 255, 0.02);
+    border: 0.1vmin solid rgba(255, 255, 255, 0.05);
+    scrollbar-width: thin;
+    scrollbar-color: #00fff2 rgba(255, 255, 255, 0.05);
+}
+
+.table-container::-webkit-scrollbar {
+    width: 0.6vmin;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #00fff2;
+    border-radius: 1vmin;
+}
+
+.dynamic-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 2vmin;
+    text-align: left;
+}
+
+.dynamic-table thead {
+    position: sticky;
+    top: 0;
+    background: #121212;
+    z-index: 10;
+}
+
+.dynamic-table th {
+    padding: 2vmin;
+    color: #00fff2;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1vmin;
+    border-bottom: 0.2vmin solid rgba(0, 255, 242, 0.2);
+}
+
+.dynamic-table td {
+    padding: 1.8vmin 2vmin;
+    border-bottom: 0.1vmin solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s ease;
+    text-align: left;
+}
+
+.dynamic-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.sno {
+    width: 5vmin;
+    color: #8892b0;
+}
+
+.name {
+    font-weight: 600;
+}
+
+.usn {
+    font-family: 'Courier New', Courier, monospace;
+    color: #ccd6f6;
+}
+
+.status {
+    font-weight: 700;
+    text-align: right;
+}
+
+@media (max-aspect-ratio: 1/1) {
+    .dynamic-table {
+        font-size: 3.5vmin;
+    }
+
+    .table-container {
+        max-height: 50vh;
+    }
+
+    .dynamic-table th,
+    .dynamic-table td {
+        padding: 3vmin;
+    }
+}

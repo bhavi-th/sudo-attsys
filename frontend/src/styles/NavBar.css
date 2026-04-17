@@ -1,0 +1,149 @@
+.NavBar {
+    width: 100%;
+    height: 8vmin;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 6vmin;
+    background: rgba(10, 10, 18, 0.85);
+    backdrop-filter: blur(1.5vmin);
+    border-bottom: 0.1vmin solid rgba(255, 255, 255, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+.nav-logo {
+    font-size: 3.5vmin;
+    font-weight: 800;
+    letter-spacing: 0.2vmin;
+    cursor: pointer;
+    background: linear-gradient(135deg, #00fff2, #0072ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    user-select: none;
+}
+
+.profile-wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.profile-wrapper img {
+    width: 5vmin;
+    height: 5vmin;
+    min-width: 28px;
+    min-height: 28px;
+    border-radius: 50%;
+    border: 0.2vmin solid rgba(0, 255, 242, 0.3);
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.profile-wrapper img:hover {
+    border-color: #00fff2;
+    box-shadow: 0 0 1.5vmin rgba(0, 255, 242, 0.4);
+    transform: scale(1.1);
+}
+
+#nav-menu {
+    position: absolute;
+    top: calc(100% + 1vmin);
+    right: 0;
+    background: rgba(15, 15, 25, 0.98);
+    backdrop-filter: blur(3vmin);
+    border: 0.1vmin solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5vmin;
+    padding: 2.5vmin;
+    min-width: 22vmin;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vmin;
+    box-shadow: 0 2vmin 5vmin rgba(0, 0, 0, 0.9);
+    animation: menuDrop 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+
+#nav-menu p {
+    font-size: 1.8vmin;
+    color: #ffffff;
+    font-weight: 600;
+    margin: 0;
+    padding-bottom: 1vmin;
+    border-bottom: 0.1vmin solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap;
+}
+
+#logout,
+#install-btn {
+    width: 100%;
+    padding: 1.2vmin;
+    background: rgba(255, 71, 71, 0.08);
+    border: 0.1vmin solid rgba(255, 71, 71, 0.2);
+    color: #ff4747;
+    border-radius: 0.8vmin;
+    font-size: 1.8vmin;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+#logout:hover {
+    background: #ff4747;
+    color: #ffffff;
+    box-shadow: 0 0 2vmin rgba(255, 71, 71, 0.4);
+}
+
+#install-btn {
+    color: var(--text-color);
+}
+
+#install-btn:hover {
+    background-color: var(--text-color);
+    color: var(--bg-color);
+}
+
+@keyframes menuDrop {
+    from {
+        opacity: 0;
+        transform: translateY(-0.5vmin);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-aspect-ratio: 1/1) {
+    .NavBar {
+        height: 12vmin;
+        padding: 0 4vmin;
+    }
+
+    .nav-logo {
+        font-size: 5vmin;
+    }
+
+    .profile-wrapper img {
+        width: 8vmin;
+        height: 8vmin;
+    }
+
+    #nav-menu {
+        min-width: 40vmin;
+        gap: 2.5vmin;
+        padding: 4vmin;
+    }
+
+    #nav-menu p,
+    #logout,
+    #install-btn {
+        font-size: 3.5vmin;
+    }
+}

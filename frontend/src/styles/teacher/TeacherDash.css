@@ -1,0 +1,157 @@
+/* Specific styling for the loading state */
+.TeacherDash:not(:has(.dashboard-container)) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4vmin;
+    font-weight: 700;
+    letter-spacing: 0.5vmin;
+    color: #00fff2;
+    text-transform: uppercase;
+    background: radial-gradient(circle at center, #0a0a12 0%, #000000 100%);
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0%,
+    100% {
+        opacity: 0.5;
+        text-shadow: 0 0 2vmin rgba(0, 255, 242, 0.2);
+    }
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 5vmin rgba(0, 255, 242, 0.6);
+    }
+}
+
+.TeacherDash {
+    min-height: 100vh;
+    background: #000000;
+    padding-top: calc(8vmin + 5vmin);
+    padding-left: 6vmin;
+    padding-right: 6vmin;
+    padding-bottom: 10vmin;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #ffffff;
+}
+
+@media (min-height: 500px) {
+    .TeacherDash {
+        padding-top: calc(8vmin + 5vmin);
+    }
+}
+
+@media (max-height: 500px) {
+    .TeacherDash {
+        padding-top: calc(40px + 5vmin);
+    }
+}
+
+.dashboard-container {
+    max-width: 120vmin;
+    margin: 0 auto;
+}
+
+.dash-section {
+    display: block;
+    font-size: 2.5vmin;
+    font-weight: 800;
+    letter-spacing: 0.5vmin;
+    color: #00fff2;
+    margin-bottom: 4vmin;
+    opacity: 0.8;
+    border-left: 0.5vmin solid #00fff2;
+    padding-left: 2vmin;
+}
+
+.subjects {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(45vmin, 1fr));
+    gap: 4vmin;
+}
+
+.subject {
+    background: rgba(255, 255, 255, 0.03);
+    border: 0.1vmin solid rgba(255, 255, 255, 0.1);
+    border-radius: 2.5vmin;
+    padding: 4vmin;
+    backdrop-filter: blur(2vmin);
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.subject:hover {
+    border-color: rgba(0, 255, 242, 0.4);
+    transform: translateY(-0.5vmin);
+}
+
+.subject-title {
+    font-size: 4.5vmin;
+    margin-bottom: 3vmin;
+    font-weight: 700;
+    background: linear-gradient(to right, #ffffff, #8892b0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.section-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2vmin;
+}
+
+.attendance-btn {
+    background: rgba(0, 255, 242, 0.05);
+    border: 0.1vmin solid rgba(0, 255, 242, 0.2);
+    color: #00fff2;
+    padding: 1.5vmin 3vmin;
+    border-radius: 1.2vmin;
+    font-size: 2vmin;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 15vmin;
+    text-align: center;
+}
+
+.attendance-btn:hover {
+    background: #00fff2;
+    color: #000000;
+    box-shadow: 0 0 2vmin rgba(0, 255, 242, 0.3);
+}
+
+.no-data {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 10vmin;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 3vmin;
+    border: 0.2vmin dashed rgba(255, 255, 255, 0.1);
+}
+
+.no-data p {
+    font-size: 3vmin;
+    color: #8892b0;
+}
+
+@media (max-aspect-ratio: 1/1) {
+    .subjects {
+        grid-template-columns: 1fr;
+    }
+
+    .subject-title {
+        font-size: 7vmin;
+    }
+
+    .attendance-btn {
+        font-size: 4vmin;
+        padding: 3.5vmin;
+    }
+
+    .dash-section {
+        font-size: 5vmin;
+    }
+}

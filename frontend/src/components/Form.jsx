@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import '../styles/Form.css';
+import toast from 'react-hot-toast';
 
 const Form = ({ formType, type }) => {
     const [email, setEmail] = useState('');
@@ -9,11 +11,115 @@ const Form = ({ formType, type }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
+    const { login } = useAuth();
 
+    const calculateStudentDetails = (emailString) => {
+        const bmsitRegex = /^(\d{2})ug1by([a-z]{2})\d{3}@bmsit\.in$/i;
+        const match = emailString.match(bmsitRegex);
+
+        if (match) {
+            const admissionYearShort = parseInt(match[1]);
+            const branchCode = match[2].toUpperCase();
+
+            const now = new Date();
+            const currentYearShort = now.getFullYear() % 100;
+            const currentMonth = now.getMonth();
+
+            let year = currentYearShort - admissionYearShort;
+            if (currentMonth >= 7) year += 1;
+            year = Math.max(1, year);
+
+            let semester = year * 2 - 1;
+            if (currentMonth > 2 && currentMonth < 7) {
+                semester = year * 2;
+            }
+
+            return {
+                year: year,
+                semester: semester,
+                branch: branchCode,
+            };
+        }
+        return null;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        e.value = 'Loading...';
+
+        const details = type === 'student' ? calculateStudentDetails(email) : null;
+
+        if (type === 'student' && !details && !academicYear) {
+            return toast.error('Please use your college email id');
+        } else if (type === 'teacher') {
+            if (!email.endsWith('@bmsit.in')) {
+                return toast.error('Teachers must use there college email id');
+            }
+        }
+
+        setIsLoading(true);
+
+        const endpoint = formType === 'Log In' ? '/login' : '/register';
+
+        try {
+            const API_BASE_URL =
+                import.meta.env.VITE_PORT && import.meta.env.VITE_PORT !== 'undefined'
+                    ? `${import.meta.env.VITE_URL}:${import.meta.env.VITE_PORT}`
+                    : import.meta.env.VITE_URL;
+
+            const payload = {
+                email,
+                password,
+                role: type,
+                ...(type === 'student' && { academicYear: details.year }),
+                ...(type === 'student' && { semester: details.semester }),
+            };
+
+            const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if (formType === 'Log In') {
+                    login({
+                        token: data.token,
+                        role: data.user.role,
+                        isOnboarded: data.user.isOnboarded,
+                        id: data.user.id,
+                    });
+
+                    toast.success('Login Successful!');
+
+                    if (!data.user.isOnboarded) {
+                        navigate(`/onboard/${data.user.role}`, {
+                            state: { branch: details?.branch },
+                        });
+                    } else {
+                        navigate(`/dash/${type}/${data.user.id}`);
+                    }
+                } else {
+                    localStorage.setItem('onboardingUserId', data.id);
+                    toast.success("Account created! Let's set up your profile.");
+                    navigate(`/onboard/${type}`, { state: { branch: details?.branch } });
+                }
+            } else {
+                toast.error(data.error || 'Something went wrong');
+                setIsLoading(false);
+            }
+        } catch (error) {
+            toast.error('Cannot connect to server. Is it running?');
+            console.error('Connection error:', error);
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="Form">
-            <form className="form" name="form">
+            <form className="form" name="form" onSubmit={handleSubmit}>
                 <Link className="logo" to="/">
                     ATTSYS2-0
                 </Link>

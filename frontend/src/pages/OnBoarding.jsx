@@ -1,6 +1,8 @@
 import '../styles/OnBoarding.css';
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth.js';
+import toast from 'react-hot-toast';
 
 const OnBoarding = ({ type }) => {
     const location = useLocation();
@@ -21,6 +23,118 @@ const OnBoarding = ({ type }) => {
     const navigate = useNavigate();
     const { user, setUser } = useAuth();
 
+    const handleSubjectCountChange = (e) => {
+        const newCount = Math.max(1, parseInt(e.target.value) || 1);
+        setSubjectCount(newCount);
+
+        setCourseLoads((prev) => {
+            if (newCount > prev.length) {
+                const extraRows = Array.from({ length: newCount - prev.length }, () => ({
+                    subject: '',
+                    sections: '',
+                    semester: '',
+                }));
+                return [...prev, ...extraRows];
+            } else {
+                return prev.slice(0, newCount);
+            }
+        });
+    };
+
+    const handleCourseChange = (index, field, value) => {
+        setCourseLoads((prev) =>
+            prev.map((course, i) => (i === index ? { ...course, [field]: value } : course)),
+        );
+    };
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        setIsLoading(true);
+
+        const isValidSection = (num) => {
+            return !isNaN(num) && num > 0 && num <= 20 && !undefined;
+        };
+
+        if (type === 'student') {
+            if (!isValidSection(studentSection)) {
+                return toast.error('Section must be a number between 1 and 20');
+            }
+        } else {
+            for (let i = 0; i < courseLoads.length; i++) {
+                const sectionArray = courseLoads[i].sections.trim().split(/\s+/);
+
+                const allValid =
+                    sectionArray.length > 0 && sectionArray.every((sec) => isValidSection(sec));
+
+                if (!allValid) {
+                    return toast.error(
+                        `Subject ${i + 1} has invalid sections. Please enter numbers between 1 and 20 (e.g., 1 5 12).`,
+                    );
+                }
+            }
+        }
+
+        const idToUpdate = user?.id || localStorage.getItem('onboardingUserId');
+        const token = user?.token;
+
+        if (!idToUpdate) {
+            toast.error('Session error. Please try signing up again.');
+            return;
+        }
+
+        const payload = {
+            name,
+            branch,
+            ...(type === 'student'
+                ? { usn, section: studentSection }
+                : {
+                      courses: courseLoads.map((c) => ({
+                          subject: c.subject,
+                          sections: c.sections
+                              .trim()
+                              .split(/\s+/)
+                              .map((sec) => parseInt(sec, 10)),
+                          semester: Number(c.semester),
+                      })),
+                  }),
+        };
+
+        try {
+            const API_BASE_URL = import.meta.env.VITE_PORT
+                ? `${import.meta.env.VITE_URL}:${import.meta.env.VITE_PORT}`
+                : import.meta.env.VITE_URL;
+            const response = await fetch(`${API_BASE_URL}/api/onboarding/${idToUpdate}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { Authorization: `Bearer ${token}` }),
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.removeItem('onboardingUserId');
+                localStorage.setItem('isOnboarded', 'true');
+                if (user) {
+                    localStorage.setItem('isOnboarded', 'true');
+                    setUser({ ...user, isOnboarded: true });
+                    navigate(`/dash/${type}/${user.id}`);
+                } else {
+                    toast.success('Profile Setup Complete! Please Login.');
+                    navigate(`/login/${type}`);
+                }
+            } else {
+                toast.error(data.error || 'Update failed');
+                setIsLoading(false);
+            }
+        } catch (err) {
+            console.error('Connection error:', err);
+            toast.error('Connection lost. Please try again.');
+            setIsLoading(false);
+        }
+    }
 
     return (
         <div className="Form">

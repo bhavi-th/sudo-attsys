@@ -1,14 +1,23 @@
 import './App.css';
 import { useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
+import NavBar from './components/NavBar';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignUp from './pages/SignUp';
+import QRScanner from './pages/student/QRScanner';
+import ProtectedRoute from './components/ProtectedRoute';
 import OnBoarding from './pages/OnBoarding';
+import TeacherDash from './pages/teacher/TeacherDash';
+import AttendancePage from './pages/teacher/AttendancePage';
+import StudentDash from './pages/student/StudentDash';
+import { Toaster } from 'react-hot-toast';
 
 const App = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user } = useAuth();
 
     useEffect(() => {
         const publicPaths = [
@@ -19,10 +28,14 @@ const App = () => {
             '/signup/teacher',
         ];
 
-    }, []);
+        if (user?.token && user?.isOnboarded && publicPaths.includes(location.pathname)) {
+            navigate(`/dash/${user.role}/${user.id}`);
+        }
+    }, [user, navigate, location.pathname]);
 
     return (
         <>
+            <Toaster position="top-center" reverseOrder={false} />
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login/student" element={<LoginPage type="student" />} />
@@ -36,6 +49,41 @@ const App = () => {
                 <Route
                     path="/onboard/student"
                     element={<OnBoarding formType="login" type="student" />}
+                />
+                <Route
+                    path="/dash/teacher/:id"
+                    element={
+                        <ProtectedRoute>
+                            <NavBar />
+                            <TeacherDash />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/attendance/:branch/:subject/:sectionName/:semester"
+                    element={
+                        <ProtectedRoute>
+                            <NavBar />
+                            <AttendancePage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/dash/student/:id"
+                    element={
+                        <ProtectedRoute>
+                            <NavBar />
+                            <StudentDash />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/qrscanner"
+                    element={
+                        <ProtectedRoute>
+                            <QRScanner />
+                        </ProtectedRoute>
+                    }
                 />
             </Routes>
         </>
