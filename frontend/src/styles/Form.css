@@ -1,0 +1,225 @@
+.Form {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #0a0a12 0%, #000000 100%);
+    font-family:
+        'Inter',
+        system-ui,
+        -apple-system,
+        sans-serif;
+    color: #ffffff;
+}
+
+.Form .logo {
+    position: absolute;
+    bottom: 100%;
+    left: 5vmin;
+    text-decoration: none;
+    font-size: 4vmin;
+    font-weight: 800;
+    background: linear-gradient(135deg, #00fff2, #0072ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: opacity 0.3s ease;
+}
+
+.Form .logo:hover {
+    opacity: 0.7;
+}
+
+.form {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(3vmin);
+    border: 0.1vmin solid rgba(255, 255, 255, 0.08);
+    padding: 8vmin;
+    border-radius: 4vmin;
+    width: 60vmin;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5vmin 15vmin rgba(0, 0, 0, 0.6);
+    animation: formEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form h1 {
+    font-size: 7vmin;
+    margin-bottom: 5vmin;
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: -0.2vmin;
+    background: linear-gradient(to bottom, #ffffff, #8892b0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.input-holder {
+    display: flex;
+    flex-direction: column;
+    gap: 3vmin;
+    margin-bottom: 5vmin;
+}
+
+.form input {
+    background: rgba(0, 0, 0, 0.2);
+    border: 0.2vmin solid rgba(255, 255, 255, 0.1);
+    padding: 2.5vmin;
+    border-radius: 1.5vmin;
+    color: #ffffff;
+    font-size: 2.4vmin;
+    transition: all 0.3s ease;
+}
+
+.form input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.form input:focus {
+    outline: none;
+    border-color: #00fff2;
+    background: rgba(0, 255, 242, 0.03);
+    box-shadow: 0 0 2vmin rgba(0, 255, 242, 0.15);
+}
+
+.form select {
+    background: rgba(0, 0, 0, 0.2);
+    border: 0.2vmin solid rgba(255, 255, 255, 0.1);
+    padding: 2.5vmin;
+    border-radius: 1.5vmin;
+    color: #ffffff;
+    font-size: 2.4vmin;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300fff2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 2.5vmin center;
+    background-size: 3vmin;
+}
+
+.form select:focus {
+    outline: none;
+    border-color: #00fff2;
+    background-color: rgba(0, 255, 242, 0.03);
+    box-shadow: 0 0 2vmin rgba(0, 255, 242, 0.15);
+}
+
+.form select option {
+    background: #0a0a12;
+    color: #ffffff;
+}
+
+@media (max-aspect-ratio: 1/1) {
+    .form select {
+        font-size: 5vmin;
+        padding: 4vmin;
+        background-size: 6vmin;
+    }
+}
+
+.form-controls {
+    display: flex;
+    gap: 2.5vmin;
+    margin-bottom: 4vmin;
+}
+
+.form-controls button {
+    flex: 1;
+    padding: 2.2vmin;
+    border-radius: 1.5vmin;
+    font-size: 2.2vmin;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    text-transform: uppercase;
+    letter-spacing: 0.1vmin;
+}
+
+.form-controls button[type='submit'] {
+    background: linear-gradient(135deg, #00fff2, #0072ff);
+    color: #050505;
+    box-shadow: 0 1vmin 3vmin rgba(0, 255, 242, 0.2);
+}
+
+.form-controls button[type='reset'] {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    border: 0.1vmin solid rgba(255, 255, 255, 0.1);
+}
+
+.form-controls button:hover {
+    transform: translateY(-0.5vmin);
+    filter: brightness(1.2);
+}
+
+.form-controls button:active {
+    transform: translateY(0);
+}
+
+.form p {
+    font-size: 2vmin;
+    color: #8892b0;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.form p a {
+    color: #00fff2;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 0 0.5vmin;
+    transition: text-shadow 0.3s ease;
+}
+
+.form p a:hover {
+    text-shadow: 0 0 1vmin #00fff2;
+}
+
+@keyframes formEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(4vmin);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-aspect-ratio: 1/1) {
+    .Form .logo {
+        font-size: 6vmin;
+    }
+
+    .form {
+        width: 80vmin;
+        padding: 8vmin;
+    }
+
+    .form h1 {
+        font-size: 10vmin;
+    }
+
+    .form input {
+        font-size: 4vmin;
+        padding: 3vmin;
+    }
+
+    .form-controls {
+        flex-direction: column-reverse;
+    }
+
+    .form button {
+        font-size: 4vmin;
+        padding: 3vmin;
+    }
+
+    .form p {
+        font-size: 3.5vmin;
+    }
+}

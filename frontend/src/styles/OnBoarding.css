@@ -1,0 +1,117 @@
+.Form .greetings {
+    text-align: center;
+    margin-bottom: 4vmin;
+    z-index: 1;
+}
+
+.Form .greetings h1 {
+    font-size: 6vmin;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff, #00fff2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1vmin;
+}
+
+.Form .greetings p {
+    font-size: 2.2vmin;
+    color: #8892b0;
+}
+
+.personal-info {
+    min-width: 60vmin;
+    width: max-content;
+    max-width: 95dvw;
+    padding-block: 5vmin;
+}
+
+.personal-info h1 {
+    font-size: 6vmin;
+}
+
+.input-holder-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2vmin;
+    max-width: 1024px;
+}
+
+.dynamic-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 2vmin;
+    margin-top: 2vmin;
+    padding-top: 2vmin;
+    border-top: 0.1vmin solid rgba(255, 255, 255, 0.1);
+}
+
+.course-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2vmin;
+    animation: rowSlideIn 0.4s ease-out;
+}
+
+.subjects {
+    min-width: 25vmin;
+    grid-column: 1/3;
+}
+
+.sections,
+.semesters {
+    min-width: 25vmin;
+}
+
+.personal-info input[type='number'] {
+    width: 100%;
+    border-color: rgba(0, 255, 242, 0.3);
+}
+
+@keyframes rowSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-2vmin);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (max-aspect-ratio: 1/1) {
+    .personal-info {
+        width: 90vmin;
+        padding: 6vmin;
+    }
+
+    .Form .greetings h1 {
+        font-size: 10vmin;
+    }
+
+    .Form .greetings p {
+        font-size: 4vmin;
+        padding: 0 5vmin;
+    }
+
+    .course-row {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, 1fr);
+        gap: 1.5vmin;
+        margin-bottom: 2.5vmin;
+    }
+
+    .subject {
+        grid-column: 1/2;
+    }
+
+    .semesters {
+        grid-row: 3/4;
+    }
+
+    .personal-info input {
+        font-size: 4.5vmin;
+        padding-inline: 3.5vmin;
+    }
+}
