@@ -35,7 +35,7 @@ router.post('/login', async (req, res) => {
                         email,
                         role: 'teacher',
                         password: await bcrypt.hash('mockpassword', 10),
-                        isOnboarded: false
+                        isOnboarded: true
                     });
                     await mockTeacher.save();
                 }
@@ -47,7 +47,7 @@ router.post('/login', async (req, res) => {
                     user: {
                         id: mockTeacher._id.toString(),
                         role: 'teacher',
-                        isOnboarded: false,
+                        isOnboarded: true,
                         email: email,
                         sessionId: sessionId
                     }

@@ -25,10 +25,40 @@ function QRScanner() {
 
             const [branch, subject, section, passkey, semester] = decodedText.split('|');
 
+            // Validate QR code format
+            if (!branch || !subject || !section || !passkey || !semester) {
+                toast.error('Invalid QR Code Format');
+                return;
+            }
+
             try {
                 const API_BASE_URL = import.meta.env.VITE_PORT
                     ? `${import.meta.env.VITE_URL}:${import.meta.env.VITE_PORT}`
                     : import.meta.env.VITE_URL;
+                    
+                toast.loading('Verifying QR Code...', { id: 'qr-verify' });
+                
+                // First find the session to get sessionId
+                const sessionResponse = await fetch(`${API_BASE_URL}/api/session/find`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        passkey,
+                        branch,
+                        subject,
+                        section: Number(section),
+                        semester: Number(semester),
+                    }),
+                });
+                
+                const sessionData = await sessionResponse.json();
+                
+                if (!sessionResponse.ok || !sessionData.success) {
+                    toast.dismiss('qr-verify');
+                    toast.error('Session not found or expired', { id: 'session-error' });
+                    return;
+                }
+                
                 const response = await fetch(`${API_BASE_URL}/api/attendance/verify`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -39,22 +69,35 @@ function QRScanner() {
                         semester: Number(semester),
                         passkey,
                         studentId: user?.id,
+                        sessionId: sessionData.data._id, // Pass the sessionId
                     }),
                 });
 
                 const data = await response.json();
+                toast.dismiss('qr-verify');
 
                 if (response.ok) {
                     // Backend successfully marked attendance
-                    toast.success('Attendance Marked Successfully!');
-                    navigate('/student/dashboard');
+                    toast.success('Attendance Marked Successfully!', { id: 'attendance-success' });
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
                 } else {
-                    toast.error(data.error || 'Verification failed');
-                    window.location.reload();
+                    const errorMessage = data.error || 'Verification failed';
+                    // Provide more helpful message for session-based attendance
+                    if (errorMessage.includes('session today')) {
+                        toast.error('Attendance already recorded for this session today. You can attend a different session.', { 
+                            id: 'attendance-error',
+                            duration: 5000 
+                        });
+                    } else {
+                        toast.error(errorMessage, { id: 'attendance-error' });
+                    }
                 }
             } catch (err) {
                 console.error('Verification Error:', err);
-                toast.error('Server Connection Failed');
+                toast.dismiss('qr-verify');
+                toast.error('Server Connection Failed', { id: 'connection-error' });
             }
         };
 

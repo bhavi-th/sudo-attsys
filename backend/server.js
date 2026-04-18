@@ -10,6 +10,7 @@ import assignmentRoutes from './routes/assignments.js';
 import assignmentMockRoutes from './routes/assignment.js';
 import studentDataRoutes from './routes/studentData.js';
 import riskAnalyzerRoutes from './routes/riskAnalyzer.js';
+import sessionRoutes from './routes/session.js';
 import dns from "node:dns/promises";
 dns.setServers(["1.1.1.1"]);
 
@@ -43,5 +44,6 @@ app.use('/api/assignments', assignmentRoutes);
 app.use('/api/assignment', assignmentMockRoutes);
 app.use('/api/analyzer', riskAnalyzerRoutes);
 app.use('/api/student', studentDataRoutes);
+app.use('/api/session', sessionRoutes);
 
 app.listen(PORT, HOST, () => console.log('🚀 Server running on port 5000'));

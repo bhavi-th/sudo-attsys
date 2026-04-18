@@ -52,14 +52,15 @@ router.post('/verify', async (req, res) => {
         const alreadyMarked = await Attendance.findOne({
             studentId,
             subject,
-            semester, // Ensure they haven't marked for this semester/subject today
+            semester,
+            sessionId: activeSession._id, // Check for same session, not just same subject
             date: { $gte: todayStart, $lte: todayEnd },
         });
 
         if (alreadyMarked) {
             return res
                 .status(400)
-                .json({ error: 'Attendance already recorded for this subject today' });
+                .json({ error: 'Attendance already recorded for this session today' });
         }
 
         await Attendance.create({
