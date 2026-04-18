@@ -162,6 +162,12 @@ const CreateAssignment = () => {
             if (res.ok) {
                 const result = await res.json();
                 console.log('Assignment created successfully:', result);
+                
+                // Trigger custom event to update assignments tab in real-time
+                window.dispatchEvent(new CustomEvent('assignmentCreated', { 
+                    detail: result 
+                }));
+                
                 navigate(`/dash/teacher/${id}/assignments`);
             } else {
                 const err = await res.json();

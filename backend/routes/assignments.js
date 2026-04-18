@@ -1,6 +1,7 @@
 import express from 'express';
 import Assignment from '../models/Assignment.js';
 import User from '../models/User.js';
+import Student from '../models/Student.js';
 
 const router = express.Router();
 
@@ -221,23 +222,31 @@ router.get('/student/:studentId', async (req, res) => {
         const { studentId } = req.params;
         const { subject, section, semester } = req.query;
 
-        // Get student info to filter by their section and semester
-        const student = await User.findById(studentId);
-        if (!student || student.role !== 'student') {
+        // Find real student by USN
+        const student = await User.findOne({ usn: studentId, role: 'student' });
+        
+        if (!student) {
             return res.status(404).json({ error: 'Student not found' });
         }
 
-        // Build query
+        console.log('Found student:', student.name, 'Section:', student.section, 'Semester:', student.semester);
+
+        // Build simple query - use student's actual section and semester
         const query = {
-            'section': student.section.toString(),
-            'semester': student.semester.toString()
+            section: student.section.toString(),
+            semester: student.semester.toString()
         };
 
-        if (subject) query.subject = subject;
+        if (subject) {
+            query.subject = subject;
+        }
+
+        console.log('Assignments query:', query);
 
         const assignments = await Assignment.find(query)
-            .sort({ dueDate: 1 })
-            .populate('teacherId', 'name email');
+            .sort({ dueDate: 1 });
+
+        console.log(`Found ${assignments.length} assignments`);
 
         res.status(200).json(assignments);
     } catch (err) {

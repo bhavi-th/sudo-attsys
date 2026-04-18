@@ -106,8 +106,6 @@ router.get('/list/:teacherId/:branch/:subject/:section/:semester', async (req, r
             semester: Number(semester), // Uncomment if your User model tracks semester
         });
 
-        const todayStart = new Date().setHours(0, 0, 0, 0);
-
         // Build the attendance query
         const attendanceQuery = {
             teacherId,
@@ -117,24 +115,36 @@ router.get('/list/:teacherId/:branch/:subject/:section/:semester', async (req, r
             section: Number(section),
         };
 
-        // If sessionId is provided, filter by that session only
+        // If sessionId is provided, filter by that session only (for real-time display during active session)
         if (sessionId) {
             attendanceQuery.sessionId = sessionId;
         } else {
-            // Otherwise, show all records from today
-            attendanceQuery.date = { $gte: new Date(todayStart) };
+            // Otherwise, keep showing the most recent session table for this class.
+            const latestSessionRecord = await Attendance.findOne(attendanceQuery)
+                .sort({ date: -1 })
+                .select('sessionId');
+
+            if (!latestSessionRecord) {
+                return res.status(200).json([]);
+            }
+
+            attendanceQuery.sessionId = latestSessionRecord.sessionId;
         }
 
         const attendanceRecords = await Attendance.find(attendanceQuery);
 
-        const presentUSNs = new Set(attendanceRecords.map((rec) => rec.usn));
+        // Create a map of student USN to their attendance status
+        const attendanceMap = {};
+        attendanceRecords.forEach((record) => {
+            attendanceMap[record.usn] = record.status;
+        });
 
         let combinedData = allStudents.map((student) => {
-            const isPresent = presentUSNs.has(student.usn);
+            const status = attendanceMap[student.usn] || 'Absent';
             return {
                 Name: student.name || 'N/A',
                 USN: student.usn || 'N/A',
-                Status: isPresent ? 'Present' : 'Absent',
+                Status: status,
             };
         });
 

@@ -2,6 +2,8 @@ import express from 'express';
 import qrcode from 'qrcode';
 import crypto from 'crypto';
 import { Session } from '../models/Session.js';
+import Attendance from '../models/Attendance.js';
+import User from '../models/User.js';
 
 const router = express.Router();
 
@@ -9,6 +11,51 @@ const SESSION_DURATION_MS = 10 * 1000;
 
 const buildPayload = ({ branch, subject, section, passkey, semester }) =>
     `${branch}|${subject}|${section}|${passkey}|${semester}|${Date.now()}`;
+
+// Helper function to create absent records for students who didn't scan during a session
+const createAbsentRecordsForSession = async (session) => {
+    try {
+        // Find all students for this session's branch, section, and semester
+        const allStudents = await User.find({
+            branch: session.branch,
+            section: session.section,
+            semester: session.semester,
+        });
+
+        // Find students who already have attendance records for this session
+        const existingAttendance = await Attendance.find({
+            sessionId: session._id,
+        });
+
+        const presentStudentIds = new Set(existingAttendance.map(record => record.studentId.toString()));
+
+        // Create absent records for students who didn't scan
+        const absentRecords = allStudents
+            .filter(student => !presentStudentIds.has(student._id.toString()))
+            .map(student => ({
+                studentId: student._id,
+                studentName: student.name,
+                usn: student.usn,
+                teacherId: session.teacherId,
+                branch: session.branch,
+                subject: session.subject,
+                section: session.section,
+                semester: session.semester,
+                sessionId: session._id,
+                status: 'Absent',
+                date: new Date(),
+            }));
+
+        // Bulk insert absent records
+        if (absentRecords.length > 0) {
+            await Attendance.insertMany(absentRecords);
+            console.log(`Created ${absentRecords.length} absent records for session ${session._id}`);
+        }
+    } catch (error) {
+        console.error('Error creating absent records:', error);
+        throw error;
+    }
+};
 
 router.post('/session/start', async (req, res) => {
     try {
@@ -55,7 +102,10 @@ router.post('/session/stop', async (req, res) => {
             return res.status(404).json({ error: 'Session not found' });
         }
 
-        return res.status(200).json({ message: 'Session stopped' });
+        // Create absent records for students who didn't scan during this session
+        await createAbsentRecordsForSession(session);
+
+        return res.status(200).json({ message: 'Session stopped and absent records created' });
     } catch (err) {
         console.error('Session stop error:', err);
         return res.status(500).json({ error: 'Failed to stop session' });

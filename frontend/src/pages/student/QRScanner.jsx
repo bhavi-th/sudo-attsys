@@ -45,8 +45,9 @@ function QRScanner() {
                 const data = await response.json();
 
                 if (response.ok) {
-                    toast.success('Attendance Marked!');
-                    navigate('/');
+                    // Backend successfully marked attendance
+                    toast.success('Attendance Marked Successfully!');
+                    navigate('/student/dashboard');
                 } else {
                     toast.error(data.error || 'Verification failed');
                     window.location.reload();

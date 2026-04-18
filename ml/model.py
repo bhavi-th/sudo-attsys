@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import LabelEncoder
 import joblib
 import os
-from .utils import load_dataset, get_feature_importance
+from utils import load_dataset, get_feature_importance
 
 class StudentRiskModel:
     def __init__(self, model_type='logistic_regression'):
@@ -157,30 +157,29 @@ class StudentRiskModel:
             risk_level = 'HIGH'
             reasons.append('Performance anomaly detected')
         
-        # Generate reasons prioritizing marks > attendance > engagement > assignment
+        # Generate reasons with specified conditions and priority order
         if not reasons:
-            # Priority-based reason generation
-            if data['avg_marks'] < 40:
-                reasons.append('Very low marks')
-            elif data['avg_marks'] < 60:
+            # Priority: 1. marks, 2. attendance, 3. engagement, 4. assignment
+            
+            # Marks conditions
+            if data['avg_marks'] < 50:
                 reasons.append('Low academic performance')
+            elif 50 <= data['avg_marks'] <= 65:
+                reasons.append('Moderate academic performance')
             
-            if data['attendance_percentage'] < 40:
-                reasons.append('Very low attendance')
-            elif data['attendance_percentage'] < 60:
+            # Attendance conditions
+            if data['attendance_percentage'] < 60:
                 reasons.append('Low attendance')
+            elif 60 <= data['attendance_percentage'] <= 75:
+                reasons.append('Moderate attendance')
             
-            if data['engagement_score'] < 40:
+            # Engagement conditions
+            if data['engagement_score'] < 50:
                 reasons.append('Low engagement')
-            elif data['engagement_score'] < 60:
-                reasons.append('Moderate engagement')
             
-            if data['assignment_completion'] < 40:
-                reasons.append('Low assignment completion')
-            
-            # Add performance gap reason if significant
-            if abs(performance_gap) > 30:
-                reasons.append('Performance mismatch')
+            # Assignment conditions
+            if data['assignment_completion'] < 60:
+                reasons.append('Incomplete assignments')
         
         # Ensure we have at least one reason
         if not reasons:

@@ -103,6 +103,7 @@ const AttendancePage = () => {
             updateQrUrl();
             qrRefreshIdRef.current = setInterval(updateQrUrl, 2000);
 
+            let hasSessionEnded = false;
             timerIdRef.current = setInterval(() => {
                 const remainingSeconds = Math.max(
                     0,
@@ -110,8 +111,9 @@ const AttendancePage = () => {
                 );
                 setTimeLeft(remainingSeconds);
 
-                if (remainingSeconds <= 0) {
-                    clearSessionState();
+                if (remainingSeconds <= 0 && !hasSessionEnded) {
+                    hasSessionEnded = true;
+                    stopSession(nextSessionId, { silent: true });
                 }
             }, 1000);
         } catch (err) {
@@ -120,8 +122,9 @@ const AttendancePage = () => {
         }
     };
 
-    const stopSession = async () => {
-        const activeSessionId = sessionId;
+    const stopSession = async (sessionIdToStop = sessionId, options = {}) => {
+        const { silent = false } = options;
+        const activeSessionId = sessionIdToStop;
         if (!activeSessionId) return;
 
         try {
@@ -133,14 +136,18 @@ const AttendancePage = () => {
             const data = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                toast.error(data.error || 'Could not stop session');
+                if (!silent) {
+                    toast.error(data.error || 'Could not stop session');
+                }
                 return;
             }
 
             clearSessionState();
         } catch (err) {
             console.error('Failed to stop session:', err);
-            toast.error('Failed to stop session');
+            if (!silent) {
+                toast.error('Failed to stop session');
+            }
         }
     };
 

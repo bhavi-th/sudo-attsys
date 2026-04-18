@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -20,6 +21,41 @@ router.get('/verify', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password, role } = req.body;
+
+        // For testing purposes, allow any teacher login
+        if (role === 'teacher') {
+            if (email.endsWith('@bmsit.in')) {
+                // Create or get mock teacher in database
+                let mockTeacher = await User.findOne({ email, role });
+                
+                if (!mockTeacher) {
+                    const teacherId = new mongoose.Types.ObjectId();
+                    mockTeacher = new User({
+                        _id: teacherId,
+                        email,
+                        role: 'teacher',
+                        password: await bcrypt.hash('mockpassword', 10),
+                        isOnboarded: false
+                    });
+                    await mockTeacher.save();
+                }
+                
+                const sessionId = 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                
+                return res.json({
+                    token: 'mock-teacher-token-' + Date.now(),
+                    user: {
+                        id: mockTeacher._id.toString(),
+                        role: 'teacher',
+                        isOnboarded: false,
+                        email: email,
+                        sessionId: sessionId
+                    }
+                });
+            } else {
+                return res.status(400).json({ error: 'Teachers must use college email id' });
+            }
+        }
 
         const user = await User.findOne({ email, role });
         if (!user) {

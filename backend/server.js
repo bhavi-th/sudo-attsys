@@ -7,6 +7,11 @@ import attendanceRoutes from './routes/attendance.js';
 import qrRouter from './routes/qr.js';
 import riskRoutes from './routes/risk.js';
 import assignmentRoutes from './routes/assignments.js';
+import assignmentMockRoutes from './routes/assignment.js';
+import studentDataRoutes from './routes/studentData.js';
+import riskAnalyzerRoutes from './routes/riskAnalyzer.js';
+import dns from "node:dns/promises";
+dns.setServers(["1.1.1.1"]);
 
 dotenv.config();
 const app = express();
@@ -35,5 +40,8 @@ app.use('/api', authRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/risk', riskRoutes);
 app.use('/api/assignments', assignmentRoutes);
+app.use('/api/assignment', assignmentMockRoutes);
+app.use('/api/analyzer', riskAnalyzerRoutes);
+app.use('/api/student', studentDataRoutes);
 
 app.listen(PORT, HOST, () => console.log('🚀 Server running on port 5000'));

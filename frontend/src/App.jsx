@@ -12,7 +12,8 @@ import OnBoarding from './pages/OnBoarding';
 import TeacherDash from './pages/teacher/TeacherDash';
 import AttendancePage from './pages/teacher/AttendancePage';
 import AttendanceHistory from './pages/teacher/AttendanceHistory';
-import StudentDash from './pages/student/StudentDash';
+import StudentDashboard from './pages/student/StudentDashboard';
+import StudentLogin from './pages/student/Login';
 import { Toaster } from 'react-hot-toast';
 import CreateAssignment from './pages/teacher/CreateAssignment';
 import AssignmentDashboard from './pages/teacher/AssignmentDashboard';
@@ -73,11 +74,23 @@ const App = () => {
                     }
                 />
                 <Route
+                    path="/student/login"
+                    element={<StudentLogin />}
+                />
+                <Route
+                    path="/student/dashboard"
+                    element={
+                        <div>
+                            <StudentLogin />
+                        </div>
+                    }
+                />
+                <Route
                     path="/dash/student/:id"
                     element={
                         <ProtectedRoute>
                             <NavBar />
-                            <StudentDash />
+                            <StudentDashboard />
                         </ProtectedRoute>
                     }
                 />
@@ -85,6 +98,7 @@ const App = () => {
                     path="/qrscanner"
                     element={
                         <ProtectedRoute>
+                            <NavBar />
                             <QRScanner />
                         </ProtectedRoute>
                     }
