@@ -71,6 +71,7 @@ router.post('/verify', async (req, res) => {
             section,
             branch,
             semester, // Saving semester to the Attendance record
+            sessionId: activeSession._id, // Link attendance to the specific session
             status: 'Present',
             date: new Date(),
         });
@@ -86,6 +87,7 @@ router.post('/verify', async (req, res) => {
 router.get('/list/:teacherId/:branch/:subject/:section/:semester', async (req, res) => {
     try {
         const { teacherId, branch, subject, semester, section } = req.params;
+        const { sessionId } = req.query; // Optional sessionId parameter
 
         const sectionNum = parseInt(section, 10);
         const semesterNum = parseInt(semester, 10);
@@ -106,15 +108,24 @@ router.get('/list/:teacherId/:branch/:subject/:section/:semester', async (req, r
 
         const todayStart = new Date().setHours(0, 0, 0, 0);
 
-        // Find attendance records for this specific semester
-        const attendanceRecords = await Attendance.find({
+        // Build the attendance query
+        const attendanceQuery = {
             teacherId,
             branch,
             subject,
             semester: Number(semester),
             section: Number(section),
-            date: { $gte: new Date(todayStart) },
-        });
+        };
+
+        // If sessionId is provided, filter by that session only
+        if (sessionId) {
+            attendanceQuery.sessionId = sessionId;
+        } else {
+            // Otherwise, show all records from today
+            attendanceQuery.date = { $gte: new Date(todayStart) };
+        }
+
+        const attendanceRecords = await Attendance.find(attendanceQuery);
 
         const presentUSNs = new Set(attendanceRecords.map((rec) => rec.usn));
 
@@ -143,6 +154,22 @@ router.get('/list/:teacherId/:branch/:subject/:section/:semester', async (req, r
     } catch (err) {
         console.error('Fetch List Error:', err);
         res.status(500).json({ error: 'Failed to fetch list' });
+    }
+});
+
+// 3. Fetch complete attendance history for a teacher
+router.get('/history/:teacherId', async (req, res) => {
+    try {
+        const { teacherId } = req.params;
+
+        const history = await Attendance.find({ teacherId })
+            .sort({ date: -1 })
+            .select('studentName usn subject branch section semester status date');
+
+        res.status(200).json(history);
+    } catch (err) {
+        console.error('Fetch History Error:', err);
+        res.status(500).json({ error: 'Failed to fetch attendance history' });
     }
 });
 

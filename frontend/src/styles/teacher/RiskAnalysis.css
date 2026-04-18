@@ -1,0 +1,244 @@
+.risk-analysis {
+    background: rgba(255, 255, 255, 0.03);
+    border: 0.1vmin solid rgba(255, 255, 255, 0.1);
+    border-radius: 2.5vmin;
+    padding: 4vmin;
+    backdrop-filter: blur(2vmin);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    margin-top: 4vmin;
+}
+
+.risk-analysis:hover {
+    border-color: rgba(0, 255, 242, 0.4);
+    transform: translateY(-0.5vmin);
+}
+
+.risk-header {
+    margin-bottom: 3vmin;
+}
+
+.risk-title {
+    font-size: 4.5vmin;
+    font-weight: 700;
+    background: linear-gradient(to right, #ffffff, #8892b0);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+}
+
+.risk-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3vmin;
+}
+
+.risk-label {
+    font-size: 2.5vmin;
+    font-weight: 600;
+    color: #00fff2;
+    margin-bottom: 1.5vmin;
+    opacity: 0.8;
+}
+
+.risk-level-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1vmin;
+}
+
+.risk-level-badge {
+    display: inline-block;
+    padding: 1.5vmin 3vmin;
+    border-radius: 1.2vmin;
+    font-size: 2.5vmin;
+    font-weight: 700;
+    color: #000000;
+    text-align: center;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 0.1vmin;
+}
+
+.risk-score-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vmin;
+}
+
+.risk-score-container {
+    display: flex;
+    align-items: center;
+    gap: 2vmin;
+}
+
+.risk-score-bar {
+    flex: 1;
+    height: 2vmin;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1vmin;
+    overflow: hidden;
+}
+
+.risk-score-fill {
+    height: 100%;
+    transition: width 0.5s ease, background-color 0.3s ease;
+    border-radius: 1vmin;
+}
+
+.risk-score-value {
+    font-size: 2.5vmin;
+    font-weight: 600;
+    color: #ffffff;
+    min-width: 8vmin;
+    text-align: right;
+}
+
+.risk-reasons-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vmin;
+}
+
+.risk-reasons-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1vmin;
+}
+
+.risk-reason-item {
+    font-size: 2vmin;
+    color: #8892b0;
+    padding: 1vmin 0;
+    border-left: 0.3vmin solid rgba(0, 255, 242, 0.3);
+    padding-left: 2vmin;
+    line-height: 1.4;
+}
+
+.risk-input-section {
+    background: rgba(255, 255, 255, 0.02);
+    border: 0.1vmin solid rgba(255, 255, 255, 0.1);
+    border-radius: 2vmin;
+    padding: 3vmin;
+    margin-bottom: 3vmin;
+}
+
+.risk-input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20vmin, 1fr));
+    gap: 2vmin;
+    margin-bottom: 2vmin;
+}
+
+.risk-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1vmin;
+}
+
+.risk-input-group label {
+    font-size: 2vmin;
+    color: #00fff2;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.risk-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 0.1vmin solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 1.5vmin;
+    border-radius: 1.2vmin;
+    font-size: 2vmin;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.risk-input:focus {
+    outline: none;
+    border-color: rgba(0, 255, 242, 0.4);
+    background: rgba(0, 255, 242, 0.05);
+}
+
+.risk-input::placeholder {
+    color: #8892b0;
+    opacity: 0.6;
+}
+
+.risk-predict-btn {
+    background: rgba(0, 255, 242, 0.05);
+    border: 0.1vmin solid rgba(0, 255, 242, 0.2);
+    color: #00fff2;
+    padding: 1.5vmin 3vmin;
+    border-radius: 1.2vmin;
+    font-size: 2vmin;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    margin-top: 1vmin;
+}
+
+.risk-predict-btn:hover:not(:disabled) {
+    background: #00fff2;
+    color: #000000;
+    box-shadow: 0 0 2vmin rgba(0, 255, 242, 0.3);
+}
+
+.risk-predict-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.risk-analysis-loading,
+.risk-analysis-error,
+.risk-analysis-no-data {
+    font-size: 2.5vmin;
+    color: #8892b0;
+    text-align: center;
+    padding: 4vmin;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 2vmin;
+    border: 0.1vmin dashed rgba(255, 255, 255, 0.1);
+}
+
+.risk-analysis-error {
+    color: #ff4444;
+    border-color: rgba(255, 68, 68, 0.3);
+}
+
+@media (max-aspect-ratio: 1/1) {
+    .risk-analysis {
+        padding: 6vmin;
+    }
+    
+    .risk-title {
+        font-size: 7vmin;
+    }
+    
+    .risk-label {
+        font-size: 4vmin;
+    }
+    
+    .risk-level-badge {
+        font-size: 4vmin;
+        padding: 3vmin 5vmin;
+    }
+    
+    .risk-score-bar {
+        height: 3vmin;
+    }
+    
+    .risk-score-value {
+        font-size: 4vmin;
+    }
+    
+    .risk-reason-item {
+        font-size: 3.5vmin;
+        padding: 2vmin 0;
+        padding-left: 3vmin;
+    }
+}

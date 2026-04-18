@@ -11,8 +11,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import OnBoarding from './pages/OnBoarding';
 import TeacherDash from './pages/teacher/TeacherDash';
 import AttendancePage from './pages/teacher/AttendancePage';
+import AttendanceHistory from './pages/teacher/AttendanceHistory';
 import StudentDash from './pages/student/StudentDash';
 import { Toaster } from 'react-hot-toast';
+import CreateAssignment from './pages/teacher/CreateAssignment';
+import AssignmentDashboard from './pages/teacher/AssignmentDashboard';
+import EditAssignment from './pages/teacher/EditAssignment';
 
 const App = () => {
     const navigate = useNavigate();
@@ -21,11 +25,11 @@ const App = () => {
 
     useEffect(() => {
         const publicPaths = [
-            '/',
             '/login/student',
             '/login/teacher',
             '/signup/student',
             '/signup/teacher',
+            '/assignment'
         ];
 
         if (user?.token && user?.isOnboarded && publicPaths.includes(location.pathname)) {
@@ -85,9 +89,55 @@ const App = () => {
                         </ProtectedRoute>
                     }
                 />
+                <Route
+                    path="/dash/teacher/:id/create-assignment"
+                    element={
+                        <ProtectedRoute>
+                            <NavBar />
+                            <CreateAssignment />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/dash/teacher/:id/attendance-history"
+                    element={
+                        <ProtectedRoute>
+                            <NavBar />
+                            <AttendanceHistory />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/dash/teacher/:id/assignments"
+                    element={
+                        <ProtectedRoute>
+                            <NavBar />
+                            <AssignmentDashboard />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/dash/teacher/:id/edit-assignment/:assignmentId"
+                    element={
+                        <ProtectedRoute>
+                            <NavBar />
+                            <EditAssignment />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/dash/teacher/:id/assignment/:assignmentId"
+                    element={
+                        <ProtectedRoute>
+                            <NavBar />
+                            <AssignmentDashboard />
+                        </ProtectedRoute>
+                    }
+                />
             </Routes>
         </>
     );
 };
 
 export default App;
+

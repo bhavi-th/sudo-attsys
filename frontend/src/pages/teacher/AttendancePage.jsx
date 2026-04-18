@@ -7,6 +7,7 @@ import '../../styles/teacher/AttendancePage.css';
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import toast from 'react-hot-toast';
 
 const AttendancePage = () => {
     const API_BASE_URL = import.meta.env.VITE_PORT
@@ -16,18 +17,25 @@ const AttendancePage = () => {
     const { branch, subject: subjectName, sectionName, semester } = useParams();
 
     const [qr, setQr] = useState(null);
+    const [sessionId, setSessionId] = useState(null);
     const [attendanceList, setAttendanceList] = useState([]);
     const [timeLeft, setTimeLeft] = useState(0);
 
     const timerIdRef = useRef(null);
+    const qrRefreshIdRef = useRef(null);
 
     useEffect(() => {
         const fetchAttendance = async () => {
             if (user?.role === 'teacher' && user?.id && sectionName && subjectName) {
                 try {
-                    const response = await fetch(
-                        `${API_BASE_URL}/api/attendance/list/${user.id}/${branch}/${subjectName}/${sectionName}/${semester}`,
-                    );
+                    let url = `${API_BASE_URL}/api/attendance/list/${user.id}/${branch}/${subjectName}/${sectionName}/${semester}`;
+                    
+                    // Add sessionId to query params if there's an active session
+                    if (sessionId) {
+                        url += `?sessionId=${sessionId}`;
+                    }
+                    
+                    const response = await fetch(url);
                     if (response.ok) {
                         const data = await response.json();
                         setAttendanceList(data);
@@ -41,38 +49,104 @@ const AttendancePage = () => {
         const interval = setInterval(fetchAttendance, 5000);
         fetchAttendance();
         return () => clearInterval(interval);
-    }, [user, branch, sectionName, subjectName, API_BASE_URL, semester]);
+    }, [user, branch, sectionName, subjectName, API_BASE_URL, semester, sessionId]);
 
-    const generateQR = () => {
-        if (timerIdRef.current) clearInterval(timerIdRef.current);
-
-        const baseUrl = `${API_BASE_URL}/qr`;
-        const params = `teacherId=${user.id}&branch=${branch}&subject=${subjectName}&section=${sectionName}&semester=${semester}&time=${Date.now()}`;
-
-        setQr(`${baseUrl}?${params}`);
-        setTimeLeft(10);
-
-        timerIdRef.current = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    clearInterval(timerIdRef.current);
-                    setQr(null);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
+    const clearSessionTimers = () => {
+        if (timerIdRef.current) {
+            clearInterval(timerIdRef.current);
+            timerIdRef.current = null;
+        }
+        if (qrRefreshIdRef.current) {
+            clearInterval(qrRefreshIdRef.current);
+            qrRefreshIdRef.current = null;
+        }
     };
 
-    const stopSession = () => {
-        if (timerIdRef.current) clearInterval(timerIdRef.current);
+    const clearSessionState = () => {
+        clearSessionTimers();
         setQr(null);
+        setSessionId(null);
         setTimeLeft(0);
+    };
+
+    const generateQR = async () => {
+        clearSessionTimers();
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/session/start`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    teacherId: user.id,
+                    branch,
+                    subject: subjectName,
+                    section: Number(sectionName),
+                    semester: Number(semester),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to start session');
+            }
+
+            const nextSessionId = data.sessionId;
+            const expiryMs = new Date(data.expiresAt).getTime();
+            setSessionId(nextSessionId);
+            setTimeLeft(Math.max(0, Math.ceil((expiryMs - Date.now()) / 1000)));
+
+            const updateQrUrl = () => {
+                setQr(`${API_BASE_URL}/qr?sessionId=${nextSessionId}&tick=${Date.now()}`);
+            };
+
+            updateQrUrl();
+            qrRefreshIdRef.current = setInterval(updateQrUrl, 2000);
+
+            timerIdRef.current = setInterval(() => {
+                const remainingSeconds = Math.max(
+                    0,
+                    Math.ceil((expiryMs - Date.now()) / 1000),
+                );
+                setTimeLeft(remainingSeconds);
+
+                if (remainingSeconds <= 0) {
+                    clearSessionState();
+                }
+            }, 1000);
+        } catch (err) {
+            console.error('Failed to start QR session:', err);
+            clearSessionState();
+        }
+    };
+
+    const stopSession = async () => {
+        const activeSessionId = sessionId;
+        if (!activeSessionId) return;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/session/stop`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId: activeSessionId }),
+            });
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                toast.error(data.error || 'Could not stop session');
+                return;
+            }
+
+            clearSessionState();
+        } catch (err) {
+            console.error('Failed to stop session:', err);
+            toast.error('Failed to stop session');
+        }
     };
 
     useEffect(() => {
         return () => {
-            if (timerIdRef.current) clearInterval(timerIdRef.current);
+            clearSessionTimers();
         };
     }, []);
 
@@ -134,9 +208,9 @@ const AttendancePage = () => {
                         <button
                             className="generate-btn"
                             onClick={generateQR}
-                            disabled={timeLeft > 0}
+                            disabled={Boolean(sessionId)}
                         >
-                            {timeLeft > 0 ? 'Active' : 'Generate QR'}
+                            {sessionId ? 'Active' : 'Generate QR'}
                         </button>
                         <button className="stop-btn" onClick={stopSession}>
                             Stop Session

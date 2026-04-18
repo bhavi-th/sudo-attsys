@@ -39,10 +39,15 @@ const attendanceSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    sessionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Session',
+        required: true,
+    },
     status: {
         type: String,
         enum: ['Present', 'Absent', 'Late'],
-        default: 'Present',
+        default: 'Absent',
     },
 });
 
